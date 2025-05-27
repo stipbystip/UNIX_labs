@@ -15,8 +15,6 @@ trap 'cleanup; exit 130' INT TERM
 trap 'cleanup; exit 1' HUP QUIT ABRT
 
 
-exec 9>/tmp/script.lock
-flock -n 9 || { echo "Error: Another instance is running." >&2; exit 1; }
 
 
 [ $# -ne 1 ] && { echo "Usage: $0 <source_file>" >&2; exit 1; }
@@ -80,5 +78,4 @@ fi
 chmod +x "$output_name" 2>/dev/null
 echo "Success: $output_name created in $WORK_DIR"
 cleanup
-flock -u 9
 exit 0
