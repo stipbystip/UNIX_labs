@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.3.2 # Используем образы от Confluent
+    image: confluentinc/cp-zookeeper:7.3.2 
     container_name: zookeeper
     hostname: zookeeper
     ports:
@@ -18,8 +18,8 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - "9092:9092" # Для внутреннего общения между контейнерами
-      - "29092:29092" # Для доступа с хост-машины (если нужно)
+      - "9092:9092" 
+      - "29092:29092" 
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
@@ -27,7 +27,7 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true' # Позволяет автоматически создавать топик
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true' 
 
   producer:
     build:
@@ -37,8 +37,8 @@ services:
     depends_on:
       - kafka
     environment:
-      KAFKA_BROKER_URL: kafka:9092 # Продюсер обращается к Kafka по внутреннему имени сервиса
-    # restart: on-failure # Можно добавить для автоматического перезапуска
+      KAFKA_BROKER_URL: kafka:9092 
+    
 
   consumer:
     build:
@@ -48,8 +48,7 @@ services:
     depends_on:
       - kafka
     environment:
-      KAFKA_BROKER_URL: kafka:9092 # Консьюмер также обращается к Kafka по внутреннему имени
-    # restart: on-failure
+      KAFKA_BROKER_URL: kafka:9092
 
 networks:
   default:
