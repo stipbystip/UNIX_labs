@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.3.2 
+    image: confluentinc/cp-zookeeper:7.3.2
     container_name: zookeeper
     hostname: zookeeper
     ports:
@@ -18,8 +18,8 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - "9092:9092" 
-      - "29092:29092" 
+      - "9092:9092"
+      - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
@@ -27,28 +27,40 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true' 
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
 
   producer:
     build:
       context: ./producer
       dockerfile: Dockerfile
-    container_name: kafka_producer
+
     depends_on:
       - kafka
     environment:
-      KAFKA_BROKER_URL: kafka:9092 
-    
+      KAFKA_BROKER_URL: kafka:9092
+      KAFKA_TOPIC: my-topic
+
+      HOSTNAME: "producer-{{.Task.Slot}}"
+    deploy:
+      replicas: 2
 
   consumer:
     build:
       context: ./consumer
       dockerfile: Dockerfile
-    container_name: kafka_consumer
+
     depends_on:
       - kafka
     environment:
       KAFKA_BROKER_URL: kafka:9092
+      KAFKA_TOPIC: my-topic
+      KAFKA_GROUP_ID: my-consumer-group
+
+      HOSTNAME: "consumer-{{.Task.Slot}}"
+    deploy:
+      replicas: 3
 
 networks:
   default:
